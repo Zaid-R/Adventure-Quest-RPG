@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,11 @@ namespace AdventureQuestRPG
     {
         private int _health = 100;
         private readonly string _name;
-        public int Health { get => _health;  set => _health = value < _health ? value : 0; }
+        public int Health
+        {
+            get => _health;
+            set => _health = value > 0 ? value : 0;
+        }
         public String Name { get => _name; }
         public int AttackPower { get; protected set; }
         public int Defense { get; protected set; }
@@ -44,6 +49,11 @@ namespace AdventureQuestRPG
             AttackPower += 2;
             Defense += 2;
         }
+
+        public void Recover()
+        {
+            Health = 100;
+        }
     }
 
     public abstract class AMonster : Charachter
@@ -59,9 +69,14 @@ namespace AdventureQuestRPG
         public Monster(string name, MonsterLevel level, Player player) : base(name)
         {
             Level = level;
+
+            AttackPower = calculateMonstProperty(player.AttackPower,level);
+            Defense = calculateMonstProperty(player.Defense,level);
+        }
+        public int calculateMonstProperty(int playerPropery, MonsterLevel level)
+        {
             double percent = 0.5 + (0.2 * (int)level);
-            AttackPower = Convert.ToInt32(player.AttackPower * percent);
-            Defense = Convert.ToInt32(player.Defense * percent);
+            return Convert.ToInt32(playerPropery * percent);
         }
     }
 

@@ -11,8 +11,8 @@ namespace AdventureQuestRPG
         public static void Attack(Charachter attacker , Charachter target)
         {
             int damage = attacker.AttackPower - target.Defense;
-            target.Health-=damage;
-            Console.WriteLine($"{attacker.Name} attacks {target.Name} | Damage : {damage} | Health: {target.Health}");
+            target.Health = target.Health - damage;
+            Console.WriteLine($"{attacker.Name} attacks {target.Name} | Damage : {damage} | {target.Name}'s health: {target.Health}\n=============\n");
         }
 
         public static void StartBattle(Player player, Monster monster)
@@ -23,23 +23,25 @@ namespace AdventureQuestRPG
             {
                 if (isPlayerTurn)
                 {
-                    Console.WriteLine("player's turn");
+                    Console.WriteLine("Player's turn ...");
                     Attack(player, monster);
                 }
                 else
                 {
-                    Console.WriteLine("monster's turn");
+                    Console.WriteLine("Monster's turn...");
                     Attack(monster, player);
                 }
                 isPlayerTurn = !isPlayerTurn;
+                //Thread.Sleep(1000);
             }
             if (player.Health == 0)
             {
-                Console.WriteLine("player wins");
+                Console.WriteLine($"{monster.Name} wins");
             }
             else 
             {
-                Console.WriteLine("monster wins");
+                Console.WriteLine($"{player.Name} wins");
+                player.Upgrade();
             }
         }
     }
