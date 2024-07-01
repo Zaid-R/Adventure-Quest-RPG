@@ -17,7 +17,7 @@ namespace AdventureQuestRPG
     {
         private int _health = 100;
         private readonly string _name;
-        public int Health { get => _health; protected set => _health = value < _health ? value : 0; }
+        public int Health { get => _health;  set => _health = value < _health ? value : 0; }
         public String Name { get => _name; }
         public int AttackPower { get; protected set; }
         public int Defense { get; protected set; }
