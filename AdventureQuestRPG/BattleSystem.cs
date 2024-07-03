@@ -11,6 +11,8 @@ namespace AdventureQuestRPG
         public static void Attack(Charachter attacker , Charachter target)
         {
             int damage = attacker.AttackPower - target.Defense;
+            // after certain number of rounds the damage will be negative due to leveling up feature, so I should eliminate the case of negative damage 
+            damage = Math.Max(1, damage);
             target.Health = target.Health - damage;
             Console.WriteLine($"{attacker.Name} attacks {target.Name} | Damage : {damage} | {target.Name}'s health: {target.Health}\n=============\n");
         }

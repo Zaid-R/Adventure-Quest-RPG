@@ -18,6 +18,7 @@ namespace AdventureQuestRPG
     {
         private int _health = 100;
         private readonly string _name;
+
         public int Health
         {
             get => _health;
@@ -25,7 +26,9 @@ namespace AdventureQuestRPG
         }
         public String Name { get => _name; }
         public int AttackPower { get; protected set; }
-        public int Defense { get; protected set; }
+        
+        public int Defense { get; protected set;}
+        
 
         public Charachter(string name)
         {
@@ -70,8 +73,9 @@ namespace AdventureQuestRPG
         {
             Level = level;
 
-            AttackPower = calculateMonstProperty(player.AttackPower,level);
-            Defense = calculateMonstProperty(player.Defense,level);
+            AttackPower = calculateMonstProperty(player.AttackPower, level);
+            
+            Defense = calculateMonstProperty(player.Defense, level);
         }
         public int calculateMonstProperty(int playerPropery, MonsterLevel level)
         {
