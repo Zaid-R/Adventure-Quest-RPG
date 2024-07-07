@@ -13,12 +13,15 @@ namespace AdventureQuestRPG
     // TODO: add comments to your code in rational way
     public class Adventure
     {
+        private static readonly int locationsLength = 3;
         private static string key = string.Empty;
         private static string filePath = Path.Combine(Environment.CurrentDirectory, "game.json");
         private static string message = string.Empty;
         private static Skill healing = new Healing();
         private static Skill specialAttack = new SpecialAttack();
         private static Player player;
+        private static Random random = new();
+        private static (int location, int monster) bossMonsterLocation = (location: random.Next(locationsLength), monster: random.Next(locationsLength));
         private static int monstersCounter;
         private static int locationsCounter;
         // TODO: maybe you can use Factory design pattern & sigleton ==> Ask GPT-4o to refactor the code using sigleton and factory and ask if the code need these patterns
@@ -96,13 +99,6 @@ namespace AdventureQuestRPG
             }
 
 
-            Random random = new();
-
-            (int, int) bossMonsterLocation = (random.Next(locations.Count), random.Next(locations.Count));
-
-            int locationsLength = 3;
-
-            ActionName playerAction = ActionName.Initial;
 
             while (locationsCounter < locationsLength && player.Health > 0)
             {
@@ -118,20 +114,24 @@ namespace AdventureQuestRPG
                 {
                     key = "1";
                 }
-
+                ActionName playerAction = key == "2" ? ActionName.EndTheGame : ActionName.Initial;
                 // Discover new location
                 if (key == "1")
                 {
-                    
+
                     if (canDiscoverNewLocation)
                     {
                         int index = random.Next(locations.Count);
                         player.CurrentLocation = locations[index];
                         locations.RemoveAt(index);
                     }
+                    else
+                    {
+                        Console.WriteLine(player.ToString());
+                    }
                     int numberOfMonsters = locationsLength - monstersCounter;
-                    Console.WriteLine($"You are in {player.CurrentLocation} now, you are facing {numberOfMonsters} monster{(numberOfMonsters==1?"":"s")}\n");
-                    
+                    Console.WriteLine($"You are in {player.CurrentLocation} now, you are facing {numberOfMonsters} monster{(numberOfMonsters == 1 ? "" : "s")}\n");
+
 
                     while (monstersCounter < locationsLength)
                     {
@@ -146,7 +146,7 @@ namespace AdventureQuestRPG
                                 break;
 
                             case ActionName.UseSKill:
-                                useSkill(bossMonsterLocation, locationsCounter, ref monstersCounter);
+                                useSkill();
                                 break;
 
                             case ActionName.SkillTree:
@@ -162,11 +162,11 @@ namespace AdventureQuestRPG
                         {
                             if (player.IsDead)
                             {
-                                //File.WriteAllText(filePath, "");
+                                File.WriteAllText(filePath, "");
                             }
                             else
                             {
-                                AdventureDto game = new AdventureDto(player, monstersCounter, locationsCounter, locations, items, monstersNames);
+                                AdventureDto game = new AdventureDto(player, bossMonsterLocation, monstersCounter, locationsCounter, locations, items, monstersNames);
                                 string jsonString = JsonConvert.SerializeObject(game);
                                 File.WriteAllText(filePath, jsonString);
                             }
@@ -188,7 +188,7 @@ namespace AdventureQuestRPG
 
             if (!player.IsDead && monstersNames.Count == 0)
             {
-                //File.WriteAllText(filePath, "");
+                File.WriteAllText(filePath, "");
                 Console.WriteLine($"Congratz {player.Name} you won the game !!!!");
             }
             else if (player.IsDead)
@@ -236,9 +236,6 @@ namespace AdventureQuestRPG
 
             player = new Player(playerName, playerAttackPower, playerHealth, playerDefense, playerInventory, playerLP, playerCurrentLocation, savedSkills, playerLevel);
 
-            int savedMonstersCounter = int.Parse(game["monstersCounter"]!.ToString());
-            int savedLocationsCounter = int.Parse(game["locationsCounter"]!.ToString());
-
             // Initialize savedLocations
             JsonArray jsonLocations = game["locations"]!.AsArray();
             List<string> savedLocations = jsonLocations.Select(node => node.ToString()).ToList();
@@ -250,13 +247,15 @@ namespace AdventureQuestRPG
             JsonArray jsonMonstersNames = game["monstersNames"]!.AsArray();
             List<string> savedMonstersNames = jsonMonstersNames.Select(node => node.ToString()).ToList();
 
+            JsonNode jsonBossLocation = game["bossMonsterLocation"];
+
+            bossMonsterLocation = (int.Parse(jsonBossLocation["Item1"].ToString()), int.Parse(jsonBossLocation["Item2"].ToString()));
             // Assign values to the fields of adventure
             items = new(savedItems);
-            monstersCounter = savedMonstersCounter;
-            locationsCounter = savedLocationsCounter;
+            monstersCounter = int.Parse(game["monstersCounter"]!.ToString()); ;
+            locationsCounter = int.Parse(game["locationsCounter"]!.ToString());
             locations = new(savedLocations);
             monstersNames = new(savedMonstersNames);
-
 
         }
 
@@ -374,7 +373,7 @@ namespace AdventureQuestRPG
             }
         }
 
-        private static void useSkill((int, int) bossMonsterLocation, int locatoinsCounter, ref int monstersCounter)
+        private static void useSkill()
         {
             message = $"\t\t[1] Use {player.skills[0].Name} then attack\n";
             if (player.skills.Count == 2)
@@ -385,7 +384,7 @@ namespace AdventureQuestRPG
             displayOptions(() => BattleSystem.getKey(1, player.skills.Count), 2);
             int skillIndex = int.Parse(key);
             player.skillInUse = player.skills[skillIndex - 1];
-            attackMonster(player, bossMonsterLocation, locatoinsCounter, ref monstersCounter);
+            attackMonster(player, bossMonsterLocation, locationsCounter, ref monstersCounter);
             player.skillInUse = null;
         }
 
@@ -440,8 +439,6 @@ namespace AdventureQuestRPG
 
         public static void attackMonster(Player player, (int, int) bossMonsterLocation, int locatoinsCounter, ref int monstersCounter)
         {
-            Random random = new Random();
-
             Monster monster;
             if (bossMonsterLocation == (locatoinsCounter, monstersCounter))
             {
