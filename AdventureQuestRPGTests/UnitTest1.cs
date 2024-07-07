@@ -43,5 +43,32 @@ namespace AdventureQuestRPGTests
             // Assert
             Assert.Equal(0, monster.Health);
         }
+
+        [Fact]
+        public void Test_Fnding_Boss_Monster() {
+            // Arrange
+            Player player = new Player("Ahmad");
+            int monstersCounterParameter = 0;
+            // Act
+            Adventure.attackMonster(player, (0,0),0,ref monstersCounterParameter);
+
+            // Assert
+            Assert.Equal(0,player.Health);
+        }
+
+        [Fact]
+        public void Test_Moving_To_New_Location()
+        {
+            // Arrange
+            Player player = new Player("Ahmad");
+            string oldLocation = player.CurrentLocation;
+            string newLocation = "Amman";
+            
+            // Act
+            player.CurrentLocation = newLocation;
+
+            // Assert
+            Assert.Equal(newLocation,player.CurrentLocation);
+        }
     }
 }
