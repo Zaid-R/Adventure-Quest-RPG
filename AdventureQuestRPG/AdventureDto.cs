@@ -13,8 +13,11 @@
         public List<Item> items;
 
         public List<string> monstersNames;
-        public AdventureDto(Player player, int monstersCounter, int locationsCounter, List<string> locations, List<Item> items, List<string> monstersNames)
+
+        public (int location, int monster) bossMonsterLocation;
+        public AdventureDto(Player player, (int location, int monster) bossMonsterLocation, int monstersCounter, int locationsCounter, List<string> locations, List<Item> items, List<string> monstersNames)
         {
+            this.bossMonsterLocation = bossMonsterLocation;
             this.player = player;
             this.monstersCounter = monstersCounter;
             this.locationsCounter = locationsCounter;

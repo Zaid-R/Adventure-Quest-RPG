@@ -127,6 +127,11 @@ namespace AdventureQuestRPG
             Console.WriteLine($"You killed all the monsters in the {CurrentLocation}, you deserve a recover | your health: 100\n");
         }
 
+        public override string ToString()
+        {
+            return $"Name: {Name} | Health: {Health} | Level: {Level} | Defense: {Defense} | Attack power: {AttackPower} | LP: {LP}";
+        }
+
     }
 
     // TODO: See when you'll create the monsters so they have the right stats, since the level and stats of the player are changing
